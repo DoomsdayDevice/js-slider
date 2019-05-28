@@ -78,8 +78,8 @@ class Slider{
     animate(signFactor, slideShift = 1){
         let adjustment = sliderWidth * slideShift / numOfFrames;
         requestAnimationFrame( () => {
-            animationFrame(this.currentXOffset, adjustment, 0, this.imagesDiv,
-                           this, signFactor, slideShift);
+            this.animationFrame(this.currentXOffset, adjustment, 0, this.imagesDiv,
+                                signFactor, slideShift);
         });
         this.animationActive = true;
     }
@@ -145,6 +145,32 @@ class Slider{
         this.imagesDiv.style.transform = `translate(${this.currentXOffset}px, 0px)`;
         this.makeDots();
         this.writeText();
+    }
+
+    animationFrame = (initialOffset, adjustment, currentFrame, div, signFactor, slideShift) => {
+        let currentOffset = initialOffset + adjustment * signFactor;
+        currentFrame += 1;
+
+        div.style.transform = `translate(${currentOffset}px, 0px)`;
+
+        if (currentFrame < numOfFrames){
+            requestAnimationFrame( () => {
+                this.animationFrame(currentOffset, adjustment, currentFrame, div,
+                                    signFactor, slideShift) ;
+            } );
+        } else {
+            if (signFactor == -1){ // when moving rightwards adjust position AFTER the animation
+                for (let i = 0; i < slideShift; i++){
+                    this.arrayOfImages.push(this.arrayOfImages.shift());
+                }
+                this.settingOrder();
+                div.style.transform = `translate(${this.currentXOffset}px, 0px)`;
+            } else {
+                this.currentXOffset += sliderWidth * slideShift * signFactor;
+            }
+
+            this.animationActive = false;
+        }
     }
 }
 
@@ -226,30 +252,6 @@ class ImagesSelector{
     }
 }
 
-function animationFrame(initialOffset, adjustment, currentFrame, div, slider, signFactor, slideShift){
-    let currentOffset = initialOffset + adjustment * signFactor;
-    currentFrame += 1;
-
-    div.style.transform = `translate(${currentOffset}px, 0px)`;
-
-    if (currentFrame < numOfFrames){
-        requestAnimationFrame( () => {
-            animationFrame(currentOffset, adjustment, currentFrame, div, slider, signFactor, slideShift);
-        } );
-    } else {
-        if (signFactor == -1){ // when moving rightwards adjust position AFTER the animation
-            for (let i = 0; i < slideShift; i++){
-                slider.arrayOfImages.push(slider.arrayOfImages.shift());
-            }
-            slider.settingOrder();
-            div.style.transform = `translate(${slider.currentXOffset}px, 0px)`;
-        } else {
-            slider.currentXOffset += sliderWidth * slideShift * signFactor;
-        }
-
-        slider.animationActive = false;
-    }
-}
 
 let mySlider = new Slider();
 let myImages = new ImagesSelector(mySlider);
