@@ -1,22 +1,33 @@
-const sliderWidth = 800;
-const sliderHeight = 400;
-const numOfFrames = 20;
+const SLIDER_WIDTH = 800;
+const SLIDER_HEIGHT = 400;
+const NUM_OF_FRAMES = 20;
+const COLORS = {
+    success: 'rgb(0, 170, 0)',
+    danger: 'rgb(170, 0, 0)'
+};
+const DOT = {
+    size: '10px',
+    sizeBig: '20px',
+    bgColor: '#fff',
+};
+const IMAGES = ["wf.jpg", "ape.jpg", "lion.jpg", "rose.jpg", "kitten.jpg", "cat.jpg",
+                "gecko.jpg", "eyes.jpg", "oldman.jpg", "politics.jpg"];
+
 
 
 class Slider{
     constructor(){
-        this.currentXOffset = -sliderWidth;
-        this.imagesDiv = document.querySelector(".slider-images");
-        this.dotsContainer = document.querySelector(".dots-container");
+        this.currentXOffset = -SLIDER_WIDTH;
+        this.imageTrain = document.querySelector(".slider__main__window__images-container");
 
         this.animationActive = false;
-        this.currentSelectedDot = 0;
-        this.listOfDots = [];
-        this.text = document.querySelector(".text");
+        this.text = document.querySelector(".slider__main__text");
+
+        this.dots = {}; // the dots object is connected later
 
 
-        let leftArrow = document.querySelector(".left-arrow");
-        let rightArrow = document.querySelector(".right-arrow");
+        let leftArrow = document.querySelector(".slider__btn-left");
+        let rightArrow = document.querySelector(".slider__btn-right");
         leftArrow.addEventListener("click", () => {
             if (!this.animationActive && this.arrayOfImages.length > 1){
                 this.slideLeft();
@@ -31,15 +42,138 @@ class Slider{
 
 
     }
+    loadImages(arrayOfImageObjects){
+        // Resetting everything upon image load
+        this.arrayOfImages = [];
+        this.imageTrain.innerHTML = "";
+
+        this.dots.listOfDots = [];
+        this.dots.dotsContainer.innerHTML = "";
+        this.dots.currentSelectedDot = 0;
+
+
+        for (let i = 0; i < arrayOfImageObjects.length; i++){
+            if (arrayOfImageObjects[i].isActive){
+                this.arrayOfImages.push(arrayOfImageObjects[i].img);
+                this.imageTrain.append(arrayOfImageObjects[i].img);
+            }
+        }
+
+        if(this.arrayOfImages.length > 2){
+            this.currentXOffset = -SLIDER_WIDTH;
+        } else {
+            this.currentXOffset = 0;
+        }
+        this.settingTrainOrder();
+        this.imageTrain.style.transform = `translate(${this.currentXOffset}px, 0px)`;
+        this.writeNumbers();
+
+        this.dots.makeDots();
+    }
+
+    writeNumbers(){
+        let currentImage = this.dots.currentSelectedDot + 1;
+        let totalImages = this.dots.listOfDots.length;
+        let string = `${currentImage}/${totalImages}`;
+        this.text.textContent = string;
+    }
+
+    settingTrainOrder(){
+        // set flex order for each item in the array
+        for (let img = 0; img < this.arrayOfImages.length; img++){
+            this.arrayOfImages[img].style.order = img;
+        }
+
+        // give last elemt -1 so it appears before the first visible image
+        if (this.arrayOfImages.length > 2){
+            this.arrayOfImages[this.arrayOfImages.length -1].style.order = -1;
+        }
+    }
+
+    slideLeft(slidesSkipped=1){
+        const direction = 1;
+
+        this.adjustTrainLeftward(slidesSkipped);
+        this.animate(direction, slidesSkipped);
+        this.dots.selectDot(-slidesSkipped);
+    }
+    slideRight(slidesSkipped=1){
+        const direction = -1;
+
+        this.animate(direction, slidesSkipped);
+        this.dots.selectDot(slidesSkipped);
+    }
+
+    adjustTrainLeftward(slidesSkipped){
+        for (let i = 0; i < slidesSkipped; i++){
+            this.arrayOfImages.unshift(this.arrayOfImages.pop());
+        }
+        this.settingTrainOrder();
+        this.currentXOffset -= SLIDER_WIDTH * slidesSkipped;
+    }
+    adjustTrainRightward(slidesSkipped){
+        for (let i = 0; i < slidesSkipped; i++){
+            this.arrayOfImages.push(this.arrayOfImages.shift());
+        }
+        this.settingTrainOrder();
+        this.adjustXOffset(this.currentXOffset);
+    }
+    adjustXOffset(offset){
+        this.imageTrain.style.transform = `translate(${offset}px, 0px)`;
+    }
+
+    animate(direction, slidesSkipped){
+        let adjustment = SLIDER_WIDTH * slidesSkipped / NUM_OF_FRAMES;
+        requestAnimationFrame( () => {
+            this.animationFrame(this.currentXOffset, adjustment, 0,
+                                direction, slidesSkipped);
+        });
+        this.animationActive = true;
+    }
+
+    animationFrame = (initialOffset, adjustment, currentFrame, direction, slidesSkipped) => {
+        let currentOffset = initialOffset + adjustment * direction;
+        currentFrame += 1;
+
+        // adjust train position
+        this.adjustXOffset(currentOffset);
+
+        if (currentFrame < NUM_OF_FRAMES){
+            requestAnimationFrame( () => {
+                this.animationFrame(currentOffset, adjustment, currentFrame,
+                                    direction, slidesSkipped) ;
+            } );
+        } else { // at the end of animation
+            if (direction == -1){ // when moving rightwards
+                this.adjustTrainRightward(slidesSkipped);
+            } else {
+                this.currentXOffset += SLIDER_WIDTH * slidesSkipped * direction;
+            }
+
+            this.animationActive = false;
+        }
+    }
+}
+
+class Dots {
+    constructor(slider){
+        this.dotsContainer = document.querySelector(".slider__main__dots");
+        this.currentSelectedDot = 0;
+        this.listOfDots = [];
+        this.slider = slider;
+        this.slider.dots = this;
+    }
+
     makeDots(){
         let currentDot;
-        for (let i = 0; i < this.arrayOfImages.length; i++){
+        for (let i = 0; i < this.slider.arrayOfImages.length; i++){
             currentDot = document.createElement("div");
             currentDot.className = "dot";
             this.dotsContainer.appendChild(currentDot);
             this.listOfDots.push(currentDot);
+
             currentDot.addEventListener("click", () => {
-                if (!this.animationActive && this.arrayOfImages.length > 1){
+                if (!this.slider.animationActive && this.slider.arrayOfImages.length > 1){
                     this.selectImage(i);
                 }
             });
@@ -47,47 +181,11 @@ class Slider{
         }
         this.selectDot(0);
     }
-    settingOrder(){
-        // set flex order for each item in the array
-        for (let img = 0; img < this.arrayOfImages.length; img++){
-            this.arrayOfImages[img].style.order = img;
-        }
-
-        // give last elemt -1
-        if (this.arrayOfImages.length > 2){
-            this.arrayOfImages[this.arrayOfImages.length -1].style.order = -1;
-        }
-    }
-    slideLeft(slideShift=1){
-        for (let i = 0; i < slideShift; i++){
-            this.arrayOfImages.unshift(this.arrayOfImages.pop());
-        }
-        this.settingOrder();
-        this.currentXOffset -= sliderWidth * slideShift;
-
-        let signFactor = 1;
-        this.animate(signFactor, slideShift);
-        this.selectDot(-slideShift);
-    }
-    slideRight(slideShift=1){
-        let signFactor = -1;
-        this.animate(signFactor, slideShift);
-        this.selectDot(slideShift);
-    }
-
-    animate(signFactor, slideShift = 1){
-        let adjustment = sliderWidth * slideShift / numOfFrames;
-        requestAnimationFrame( () => {
-            this.animationFrame(this.currentXOffset, adjustment, 0, this.imagesDiv,
-                                signFactor, slideShift);
-        });
-        this.animationActive = true;
-    }
     selectDot(shift){
         let dotStyle = this.listOfDots[this.currentSelectedDot].style;
-        dotStyle.backgroundColor = "white";
-        dotStyle.width = "10px";
-        dotStyle.height = "10px";
+        dotStyle.backgroundColor = DOT.bgColor;
+        dotStyle.width = DOT.size;
+        dotStyle.height = DOT.size;
         dotStyle.opacity = ".5";
 
         this.currentSelectedDot += shift;
@@ -98,145 +196,91 @@ class Slider{
         }
 
         dotStyle = this.listOfDots[this.currentSelectedDot].style;
-        dotStyle.backgroundColor = "white";
+        dotStyle.backgroundColor = DOT.bgColor;
         dotStyle.opacity = "1";
-        dotStyle.width = "20px";
-        dotStyle.height = "20px";
-        this.writeText();
+        dotStyle.width = DOT.sizeBig;
+        dotStyle.height = DOT.sizeBig;
+        this.slider.writeNumbers();
     }
-    selectImage(slideShift){
+    selectImage(slidesSkipped){
         // calc diff between current selected dot and number
         // do that many slides in that direction
-        let difference = slideShift - this.currentSelectedDot;
+        let difference = slidesSkipped - this.currentSelectedDot;
         if (difference >= 0){
-            this.slideRight(difference);
+            this.slider.slideRight(difference);
         } else {
-            this.slideLeft(Math.abs(difference));
-        }
-    }
-    writeText(){
-        let currentImage = this.currentSelectedDot + 1;
-        let totalImages = this.listOfDots.length;
-        let string = `${currentImage}/${totalImages}`;
-        this.text.textContent = string;
-    }
-
-    reloadActiveImages(arrayOfImageObjects){
-        this.arrayOfImages = [];
-        this.listOfDots = [];
-        this.dotsContainer.innerHTML = "";
-        this.currentSelectedDot = 0;
-        this.imagesDiv.innerHTML = "";
-
-
-        for (let i = 0; i < arrayOfImageObjects.length; i++){
-            if (arrayOfImageObjects[i].isActive){
-                this.arrayOfImages.push(arrayOfImageObjects[i].img);
-                this.imagesDiv.append(arrayOfImageObjects[i].img);
-            }
-        }
-
-        if(this.arrayOfImages.length > 2){
-            this.currentXOffset = -sliderWidth;
-        } else {
-            this.currentXOffset = 0;
-        }
-        this.settingOrder();
-        this.imagesDiv.style.transform = `translate(${this.currentXOffset}px, 0px)`;
-        this.makeDots();
-        this.writeText();
-    }
-
-    animationFrame = (initialOffset, adjustment, currentFrame, div, signFactor, slideShift) => {
-        let currentOffset = initialOffset + adjustment * signFactor;
-        currentFrame += 1;
-
-        div.style.transform = `translate(${currentOffset}px, 0px)`;
-
-        if (currentFrame < numOfFrames){
-            requestAnimationFrame( () => {
-                this.animationFrame(currentOffset, adjustment, currentFrame, div,
-                                    signFactor, slideShift) ;
-            } );
-        } else {
-            if (signFactor == -1){ // when moving rightwards adjust position AFTER the animation
-                for (let i = 0; i < slideShift; i++){
-                    this.arrayOfImages.push(this.arrayOfImages.shift());
-                }
-                this.settingOrder();
-                div.style.transform = `translate(${this.currentXOffset}px, 0px)`;
-            } else {
-                this.currentXOffset += sliderWidth * slideShift * signFactor;
-            }
-
-            this.animationActive = false;
+            this.slider.slideLeft(Math.abs(difference));
         }
     }
 }
 
-class ImagesSelector{
+class ImageSelector{
     // list all images
     constructor(slider){
         this.slider = slider;
-        this.listOfImageNames = [];
-        this.lines = [];
+        this.namesOfImageFiles = IMAGES;
         this.arrayOfImages = [];
 
-        this.listImageNames();
+        this.loadImagesFromFolder();
 
+        // create checkbuttons for each pic and add event listeners for them
+        this.createCheckButtons();
 
-        let container = document.querySelector(".image-selector");
+        this.slider.loadImages(this.arrayOfImages);
+    }
+    createCheckButtons(){
+        const container = document.querySelector(".image-selector");
+        const paragraphs = []; // <p> tags for each image checkbox
+        let p;
+        for (let i = 0; i < this.namesOfImageFiles.length; i++){
+            p = document.createElement("p");
 
-        let checkbox;
-        let line;
-        for (let i = 0; i < this.listOfImageNames.length; i++){
-            line = document.createElement("p");
+            p.style.backgroundColor = COLORS.success;
+            paragraphs.push(p);
 
-            line.style.backgroundColor = "rgb(0, 170, 0)";
-            this.lines.push(line);
-
-            line.textContent = this.listOfImageNames[i];
-            container.appendChild(line);
-
-            this.lines[i].addEventListener("click", () => {
-                if (this.lines[i].style.backgroundColor == "rgb(0, 170, 0)" && this.isMoreThanOne()){
-                    this.lines[i].style.backgroundColor = "rgb(170, 0, 0)";
-                    this.arrayOfImages[i].isActive = false;
-                } else {
-                    this.lines[i].style.backgroundColor = "rgb(0, 170, 0)";
-                    this.arrayOfImages[i].isActive = true;
-                }
-                this.slider.reloadActiveImages(this.arrayOfImages);
-            });
+            p.textContent = this.namesOfImageFiles[i];
+            container.appendChild(p);
+            this.addOnClickEvents(p, this.arrayOfImages[i]);
         }
+    }
+    addOnClickEvents(p, imageObject){
+        p.addEventListener("click", () => {
+            if (p.style.backgroundColor == COLORS.success &&
+                this.thereIsMoreThanOnePic()) {
 
-        this.loadImages();
+                p.style.backgroundColor = COLORS.danger;
+                imageObject.isActive = false;
+
+            } else {
+
+                p.style.backgroundColor = COLORS.success;
+                imageObject.isActive = true;
+
+            }
+            this.slider.loadImages(this.arrayOfImages);
+        });
     }
-    listImageNames(){
-        this.listOfImageNames = ["wf.jpg", "ape.jpg", "lion.jpg", "rose.jpg", "kitten.jpg", "cat.jpg",
-                          "gecko.jpg", "eyes.jpg", "oldman.jpg", "politics.jpg"];
-    }
-    loadImages(){
+    loadImagesFromFolder(){
         let images = [];
         let currentImage;
-        for (let i = 0; i < 10; i++){
+        for (let i = 0; i < 10; i++){ // add the listed images to the array
             images.push({});
 
             currentImage = new Image();
-            currentImage.src = "slider-pics/" + this.listOfImageNames[i];
+            currentImage.src = "images/" + this.namesOfImageFiles[i];
             currentImage.className = "image";
 
             let currentDiv = document.createElement("div");
-            currentDiv.className = "image-div";
+            currentDiv.className = "image-container";
             currentDiv.appendChild (currentImage);
 
             images[i].img = currentDiv;
             images[i].isActive = true;
         }
         this.arrayOfImages = images;
-        this.slider.reloadActiveImages(this.arrayOfImages);
     }
-    isMoreThanOne(){
+
+    thereIsMoreThanOnePic(){
         let counter = 0;
         for (let i = 0; i < this.arrayOfImages.length; i++){
             if (this.arrayOfImages[i].isActive){
@@ -253,5 +297,6 @@ class ImagesSelector{
 }
 
 
-let mySlider = new Slider();
-let myImages = new ImagesSelector(mySlider);
+const mySlider = new Slider();
+const myDots = new Dots(mySlider);
+const myImageSelector = new ImageSelector(mySlider);
