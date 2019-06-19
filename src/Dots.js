@@ -1,7 +1,8 @@
 import { DOT } from './vars.js';
+
 export default class Dots {
   constructor(slider){
-    this.dotsContainer = document.querySelector(".slider__main__dots");
+    this.dotsContainer = document.querySelector(".image-slider__dots");
     this.currentSelectedDot = 0;
     this.listOfDots = [];
     this.slider = slider;
@@ -12,7 +13,7 @@ export default class Dots {
     let currentDot;
     for (let i = 0; i < this.slider.arrayOfImages.length; i++){
       currentDot = document.createElement("div");
-      currentDot.className = "dot";
+      currentDot.className = "image-slider__dot";
       this.dotsContainer.appendChild(currentDot);
       this.listOfDots.push(currentDot);
 
