@@ -1,32 +1,28 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8"/>
-        <title>Image Slider</title>
-        <link rel="stylesheet" type="text/css" href="css/styles.css" >
+  <head>
+    <meta charset="UTF-8"/>
+    <title>Image Slider</title>
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+         <meta name="apple-mobile-web-app-capable" content="yes"> -->
+  </head>
+  <body>
+    <div id="image-slider"> </div>
 
+    <section class="slider">
+      <div class="slider__btn slider__btn-left"></div>
+      <div class="slider__main">
 
-        <!-- <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
-             <meta name="apple-mobile-web-app-capable" content="yes"> -->
-    </head>
-    <body>
-        <section class="slider">
-            <div class="slider__btn slider__btn-left"></div>
-            <div class="slider__main">
+        <div class="slider__main__window">
+          <div class="slider__main__window__images-container"></div>
+        </div>
 
-                <div class="slider__main__window">
-                    <div class="slider__main__window__images-container"></div>
-                </div>
-
-                <div class="slider__main__dots"></div>
-                <p class="slider__main__text"></p>
-            </div>
-            <div class="slider__btn slider__btn-right"></div>
-        </section>
-        <section class="image-selector"></section>
-        <!-- <button onclick="myImages.test()">PRESS</button> -->
-        <!-- <img src="images/head.png" class="moving-image" alt="no pico"> -->
-
-        <script src="slider.js"></script>
-    </body>
+        <div class="slider__main__dots"></div>
+        <p class="slider__main__text"></p>
+      </div>
+      <div class="slider__btn slider__btn-right"></div>
+    </section>
+    <section class="image-selector"></section>
+    <script type="module" src="build/browser/imageSlider.js"></script>
+  </body>
 </html>
