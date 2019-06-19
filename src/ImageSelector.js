@@ -1,5 +1,3 @@
-import { COLORS } from './vars.js';
-
 export default class ImageSelector{
   // list all images
   constructor(slider, images){
@@ -21,7 +19,7 @@ export default class ImageSelector{
     for (let i = 0; i < this.namesOfImageFiles.length; i++){
       p = document.createElement("p");
 
-      p.style.backgroundColor = COLORS.success;
+      p.classList.add('image-slider_selected');
       paragraphs.push(p);
 
       p.textContent = this.namesOfImageFiles[i];
@@ -31,17 +29,10 @@ export default class ImageSelector{
   }
   addOnClickEvents(p, imageObject){
     p.addEventListener("click", () => {
-      if (p.style.backgroundColor == COLORS.success &&
-          this.thereIsMoreThanOnePic()) {
-
-        p.style.backgroundColor = COLORS.danger;
-        imageObject.isActive = false;
-
-      } else {
-
-        p.style.backgroundColor = COLORS.success;
-        imageObject.isActive = true;
-
+      if (this.thereIsMoreThanOnePic()){
+        console.log("Hello Bitches");
+        p.classList.toggle('image-slider_selected');
+        imageObject.isActive = !imageObject.isActive;
       }
       this.slider.loadImages(this.arrayOfImages);
     });
