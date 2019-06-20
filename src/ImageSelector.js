@@ -1,6 +1,6 @@
-export default class ImageSelector{
+export default class ImageSelector {
   // list all images
-  constructor(slider, images){
+  constructor(slider, images) {
     this.slider = slider;
     this.namesOfImageFiles = images;
     this.arrayOfImages = [];
@@ -12,12 +12,12 @@ export default class ImageSelector{
 
     this.slider.loadImages(this.arrayOfImages);
   }
-  createCheckButtons(){
-    const container = document.querySelector(".image-slider__selector");
+  createCheckButtons() {
+    const container = document.querySelector('.image-slider__selector');
     const paragraphs = []; // <p> tags for each image checkbox
     let p;
-    for (let i = 0; i < this.namesOfImageFiles.length; i++){
-      p = document.createElement("p");
+    for (let i = 0; i < this.namesOfImageFiles.length; i++) {
+      p = document.createElement('p');
 
       p.classList.add('image-slider_selected');
       paragraphs.push(p);
@@ -27,48 +27,43 @@ export default class ImageSelector{
       this.addOnClickEvents(p, this.arrayOfImages[i]);
     }
   }
-  addOnClickEvents(p, imageObject){
-    p.addEventListener("click", () => {
-      if (this.thereIsMoreThanOnePic()){
-        console.log("Hello Bitches");
+  addOnClickEvents(p, imageObject) {
+    p.addEventListener('click', () => {
+      if (this.onlyOnePicSelected()) {
+        p.classList.add('image-slider_selected');
+        imageObject.isActive = true;
+      } else {
         p.classList.toggle('image-slider_selected');
         imageObject.isActive = !imageObject.isActive;
       }
       this.slider.loadImages(this.arrayOfImages);
     });
   }
-  loadImagesFromFolder(){
+  onlyOnePicSelected() {
+    let counter = -1;
+    this.arrayOfImages.forEach(image => {
+      if (image.isActive) counter++;
+    });
+    return !counter;
+  }
+  loadImagesFromFolder() {
     let images = [];
     let currentImage;
-    for (let i = 0; i < 10; i++){ // add the listed images to the array
+    for (let i = 0; i < 10; i++) {
+      // add the listed images to the array
       images.push({});
 
       currentImage = new Image();
-      currentImage.src = "src/images/" + this.namesOfImageFiles[i];
-      currentImage.className = "image-slider__image";
+      currentImage.src = 'src/images/' + this.namesOfImageFiles[i];
+      currentImage.className = 'image-slider__image';
 
-      let currentDiv = document.createElement("div");
-      currentDiv.className = "image-slider__image-container";
+      let currentDiv = document.createElement('div');
+      currentDiv.className = 'image-slider__image-container';
       currentDiv.appendChild(currentImage);
 
       images[i].img = currentDiv;
       images[i].isActive = true;
     }
     this.arrayOfImages = images;
-  }
-
-  thereIsMoreThanOnePic(){
-    let counter = 0;
-    for (let i = 0; i < this.arrayOfImages.length; i++){
-      if (this.arrayOfImages[i].isActive){
-        counter++;
-      }
-    }
-
-    if (counter > 1){
-      return true;
-    } else {
-      return false;
-    }
   }
 }

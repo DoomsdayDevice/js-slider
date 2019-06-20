@@ -2,21 +2,21 @@
   "name": "js-slider",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "build": "webpack --config prod.config.js",
     "dev": "webpack-dev-server"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/doomsdaydevice/js-slider.git"
+    "url": ""
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/doomsdaydevice/js-slider/issues"
+    "url": ""
   },
-  "homepage": "https://github.com/doomsdaydevice/js-slider#readme",
+  "homepage": "",
   "devDependencies": {
     "css-loader": "^3.0.0",
     "handlebars": "^4.1.2",
