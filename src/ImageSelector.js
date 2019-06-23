@@ -40,11 +40,11 @@ export default class ImageSelector {
     });
   }
   onlyOnePicSelected() {
-    let counter = -1;
-    this.arrayOfImages.forEach(image => {
-      if (image.isActive) counter++;
-    });
-    return !counter;
+    const count = this.arrayOfImages.reduce(
+      (acc, img) => acc + (img.isActive ? 1 : 0),
+      -1
+    );
+    return !count;
   }
   loadImagesFromFolder() {
     let images = [];
