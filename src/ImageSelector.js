@@ -13,13 +13,13 @@ export default class ImageSelector {
     this.slider.loadImages(this.arrayOfImages);
   }
   createCheckButtons() {
-    const container = document.querySelector('.image-slider__selector');
+    const container = document.querySelector('.slider__selector');
     const paragraphs = []; // <p> tags for each image checkbox
     let p;
     for (let i = 0; i < this.namesOfImageFiles.length; i++) {
       p = document.createElement('p');
 
-      p.classList.add('image-slider_selected');
+      p.classList.add('slider_selected');
       paragraphs.push(p);
 
       p.textContent = this.namesOfImageFiles[i];
@@ -30,10 +30,10 @@ export default class ImageSelector {
   addOnClickEvents(p, imageObject) {
     p.addEventListener('click', () => {
       if (this.onlyOnePicSelected()) {
-        p.classList.add('image-slider_selected');
+        p.classList.add('slider_selected');
         imageObject.isActive = true;
       } else {
-        p.classList.toggle('image-slider_selected');
+        p.classList.toggle('slider_selected');
         imageObject.isActive = !imageObject.isActive;
       }
       this.slider.loadImages(this.arrayOfImages);
@@ -55,10 +55,10 @@ export default class ImageSelector {
 
       currentImage = new Image();
       currentImage.src = 'src/images/' + this.namesOfImageFiles[i];
-      currentImage.className = 'image-slider__image';
+      currentImage.className = 'slider__image';
 
       let currentDiv = document.createElement('div');
-      currentDiv.className = 'image-slider__image-container';
+      currentDiv.className = 'slider__image-container';
       currentDiv.appendChild(currentImage);
 
       images[i].img = currentDiv;

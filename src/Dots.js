@@ -2,7 +2,7 @@ import { DOT } from './vars.js';
 
 export default class Dots {
   constructor(slider) {
-    this.dotsContainer = document.querySelector('.image-slider__dots');
+    this.dotsContainer = document.querySelector('.slider__dots');
     this.currentSelectedDot = 0;
     this.listOfDots = [];
     this.slider = slider;
@@ -13,7 +13,7 @@ export default class Dots {
     let currentDot;
     for (let i = 0; i < this.slider.arrayOfImages.length; i++) {
       currentDot = document.createElement('div');
-      currentDot.className = 'image-slider__dot';
+      currentDot.className = 'slider__dot';
       this.dotsContainer.appendChild(currentDot);
       this.listOfDots.push(currentDot);
 
@@ -29,11 +29,9 @@ export default class Dots {
     this.selectDot(0);
   }
   selectDot(shift) {
-    let dotStyle = this.listOfDots[this.currentSelectedDot].style;
-    dotStyle.backgroundColor = DOT.bgColor;
-    dotStyle.width = DOT.size;
-    dotStyle.height = DOT.size;
-    dotStyle.opacity = '.5';
+    this.listOfDots[this.currentSelectedDot].classList.remove(
+      'slider__dot--selected'
+    );
 
     this.currentSelectedDot += shift;
 
@@ -43,11 +41,9 @@ export default class Dots {
       this.currentSelectedDot = 0;
     }
 
-    dotStyle = this.listOfDots[this.currentSelectedDot].style;
-    dotStyle.backgroundColor = DOT.bgColor;
-    dotStyle.opacity = '1';
-    dotStyle.width = DOT.sizeBig;
-    dotStyle.height = DOT.sizeBig;
+    this.listOfDots[this.currentSelectedDot].classList.add(
+      'slider__dot--selected'
+    );
     this.slider.writeNumbers();
   }
   selectImage(slidesSkipped) {

@@ -3,15 +3,15 @@ import { SLIDER_WIDTH, SLIDER_HEIGHT, NUM_OF_FRAMES, COLORS } from './vars.js';
 export default class Slider {
   constructor() {
     this.currentXOffset = -SLIDER_WIDTH;
-    this.imageTrain = document.querySelector('.image-slider__image-train');
+    this.imageTrain = document.querySelector('.slider__image-train');
 
     this.animationActive = false;
-    this.text = document.querySelector('.image-slider__text');
+    this.text = document.querySelector('.slider__text');
 
     this.dots = {}; // the dots object is connected later
 
-    let leftArrow = document.querySelector('.image-slider__btn-left');
-    let rightArrow = document.querySelector('.image-slider__btn-right');
+    let leftArrow = document.querySelector('.slider__btn-left');
+    let rightArrow = document.querySelector('.slider__btn-right');
     leftArrow.addEventListener('click', () => {
       if (!this.animationActive && this.arrayOfImages.length > 1) {
         this.slideLeft();
@@ -44,9 +44,7 @@ export default class Slider {
       : (this.currentXOffset = 0);
 
     this.settingTrainOrder();
-    this.imageTrain.style.transform = `translate(${
-      this.currentXOffset
-    }px, 0px)`;
+    this.imageTrain.style.transform = `translate(${this.currentXOffset}px, 0px)`;
     this.writeNumbers();
 
     this.dots.makeDots();
@@ -61,9 +59,7 @@ export default class Slider {
 
   settingTrainOrder() {
     // set flex order for each item in the array
-    this.arrayOfImages.forEach((img, i) => {
-      img.style.order = i;
-    });
+    this.arrayOfImages.forEach((img, i) => (img.style.order = i));
 
     // give last elemt -1 so it appears before the first visible image
     if (this.arrayOfImages.length > 2)
